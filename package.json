@@ -1,6 +1,6 @@
 {
   "name": "@j.u.p.iter/database-backup",
-  "version": "0.0.0-semantically-released",
+  "version": "0.0.2",
   "description": "Database backup",
   "main": "dist/lib/index.js",
   "typings": "dist/types",
