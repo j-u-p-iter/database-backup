@@ -1,0 +1,33 @@
+version: 2.1
+
+aliases:
+  - &docker
+    - image: circleci/openjdk:8-jdk-node-browsers
+
+jobs:
+  validate:
+    docker: *docker
+
+    steps:
+    - checkout
+    - run: yarn install
+    - run: yarn run validate
+
+  deploy:
+    docker: *docker
+
+    steps:
+      - checkout
+      - run: yarn install
+      - run: yarn run build
+      - run: yarn run deploy
+
+workflows:
+  version: 2
+  validate-and-deploy:
+    jobs:
+      - validate
+      - deploy:
+          context: package
+          requires:
+            - validate

@@ -13,6 +13,7 @@
     "lint": "jupiter-scripts lint --format codeFrame",
     "lint:fix": "yarn run lint --fix",
     "test": "jupiter-scripts test",
+    "validate": "jupiter-scripts validate",
     "deploy": "jupiter-scripts deploy"
   },
   "devDependencies": {
