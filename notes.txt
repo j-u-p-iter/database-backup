@@ -1,0 +1,66 @@
+Today I'm going to start implementing DatabaseBackup tool.
+
+# The main goal of a feature.
+
+I have a blog project, and all articles for this project are stored in a mongodb database. Server of the project is written on NodeJS. 
+And, I don't want to loose accidentally content of this project. You know, anything can happen and a database can be accidentally corrupted.
+
+For this reason I need a tool, that create database backups automatically with some frequency.
+
+# The working principle.
+
+This is what should happen, when we create DatabaseBackup:
+
+1. The DatabaseBackup service should know the place, where to store all such backups. So, we will initialise DatabaseBackup 
+service with the path to the root folder, where we will store all backups. The path can be either relative or absolute. If path is relative
+it should be relative to the root folder of the project. We detect the root folder of the project by presence of package.json.
+
+2. To run backup the DatabaseBackup instance will have "create" method.  
+
+3. After we start running the tool the first thing we should do is to check a presence of the root folder, described in the first item of the plan.
+   If there is no such a folder, the DatabaseBackup should throw an appropriate error.
+
+4. If there is a root folder for backups, we need to create a new folder for the new backup. Each folder name for new backup should be unique. 
+To achieve this goal the name of each folder will be based on the current Date and will have next format: YYYY-MM-DD.
+
+Here: YYYY - the current year; MM - the current month; DD - the current day.
+
+For example, for backups, made on 21 first of June in 2021 year we would create a folder with name: 2021-06-21.
+
+Backups will be created 1 time per day. So, collisions among folders names are not possible.
+
+5. Also we should care about available free space on the server. We don't need to store there all backups we've ever created. So, we should constantly remove 
+outdated backups. It's enough to have backups only for the last 2 days, for example. For this purpose we need to be able to 
+set up amount of days we want to store backups for during initialization step of DatabaseBackup.
+All backups, created earlier - should be removed by the tool. So, one more option, that the DatabaseBackup service should get is the amount 
+of days to store backups for.
+
+When exactly should we removed outdated backups? Each time after we successfully create new backups folder we should check a presence of the old one. 
+And if there is - we should remove it. 
+
+6. The backups itself will be created by the `mongodump` utility and will be run, using exec method, provided by NodeJS.
+
+7. So, to summerise the whole working flow, this is, how it should look:
+  - DatabaseBackup service should get one required option by default - this is the path to the root folder for all backups of the project;
+  - DatabaseBackup service should get additional optional parameter - the amount of days it should store backups for. By default it equals to 5.
+  - After we execute "create" method of the DatabaseBackup instance we should check a presence of the root folder for backups and if there is no such a 
+    folder - we throw an appropriate error. At this moment execution of "create" method stops.
+  - If there is the root folder, we create a new folder for the today database backup inside of the root folder, based on format: YYYY-DD-MM.
+  - After we've created folder for a new backup we should start backuping process with the "exec" command, using the "mongodump" utility.
+  - After the backup has been successfully created we need to remove folder with the old backups.
+
+
+# Third party dependencies, that we are using in this project.
+  "mongodump" utility will be a third party peer dependency. It should be installed in the project itself but not in the DatabaseBackup package. 
+
+# The testing plan.
+
+1. Check, that a correct error, thrown, when there is not root folder to store backups. 
+
+2. Check, that new backup folder has a correct name. For this purpose we need to mock several dates and to check,
+   that for each of such date the correct folder name was created.
+
+3. Check, that the old backup folder is removed properly. Also we should check, that the amount of days we store backups for is correctly set up
+   by an appropriate option.
+
+4. If there is no the "mongodump" utility in the project - an appropriate error should be thrown.
