@@ -46,7 +46,7 @@ describe('DatabaseBackup', () => {
       const runDabatabaseBackup = databaseBackup.run();
 
       expect(runDabatabaseBackup).rejects.toThrow(InvalidPathError);
-      expect(runDabatabaseBackup).rejects.toThrow('Directory /Users/j.u.p.iter/projects/database-backup/someInvalidPath does not exist');
+      expect(runDabatabaseBackup).rejects.toThrow(`Directory ${path.join(__dirname, '../someInvalidPath')} does not exist`);
     });
   });
 
